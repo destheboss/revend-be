@@ -12,6 +12,7 @@ import jakarta.validation.Valid;
 @RestController
 @RequestMapping("/users")
 @AllArgsConstructor
+@CrossOrigin(origins = "http://localhost:3000")
 public class UsersController {
     private final CreateUserUseCase createUserUseCase;
     private final DeleteUserUseCase deleteUserUseCase;
