@@ -1,5 +1,6 @@
 package revend.business.impl;
 
+import jakarta.transaction.Transactional;
 import revend.business.CreateUserUseCase;
 import revend.business.exception.EmailAlreadyExistsException;
 import revend.domain.CreateUserRequest;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 public class CreateUserUseCaseImpl implements CreateUserUseCase {
     private final UserRepository userRepository;
     @Override
+    @Transactional
     public CreateUserResponse createUser(CreateUserRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new EmailAlreadyExistsException();

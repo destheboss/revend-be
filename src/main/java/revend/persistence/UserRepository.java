@@ -1,18 +1,12 @@
 package revend.persistence;
 
+import org.springframework.data.jpa.repository.JpaRepository;
 import revend.persistence.entity.UserEntity;
 
-import java.util.List;
 import java.util.Optional;
 
-public interface UserRepository {
+public interface UserRepository extends JpaRepository<UserEntity, Long> {
     Optional<UserEntity> findByEmail(String email);
-
-    UserEntity save(UserEntity user);
-
     void deleteByEmail(String email);
-
-    List<UserEntity> findAll();
-
     boolean existsByEmail(String email);
 }
