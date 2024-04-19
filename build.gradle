@@ -7,12 +7,6 @@ plugins {
     id "org.flywaydb.flyway" version "7.15.0"
 }
 
-flyway {
-    url = 'jdbc:mysql://localhost:3306/revend'
-    user = 'root'
-    password = 'rootpass'
-}
-
 group = 'org.example'
 version = '0.0.1-SNAPSHOT'
 
@@ -63,10 +57,9 @@ sonar {
         property "sonar.projectKey", "I457570_revend_71b5cc44-73f4-4011-ba72-a153f89300e8"
         property "sonar.projectName", "ReVend"
         property "sonar.qualitygate.wait", true
+        property "sonar.host.url","http://localhost:9000/"
         property "sonar.token", "sqp_cda02bba9a431c5ec45dc95392e30755b8e52cc8"
+        property "sonar.java.coveragePlugin", "jacoco"
+        property "sonar.coverage.jacoco.xmlReportPaths", "${project.buildDir}/reports/jacoco/test/jacocoTestReport.xml"
     }
-}
-
-tasks.named('test') {
-    useJUnitPlatform()
 }
