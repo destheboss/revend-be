@@ -60,7 +60,7 @@ sonar {
         property "sonar.projectName", "ReVend"
         property "sonar.qualitygate.wait", true
         property "sonar.host.url","http://localhost:9000/"
-        property "sonar.token", "sqp_cda02bba9a431c5ec45dc95392e30755b8e52cc8"
+        property "sonar.token", System.getenv("SONAR_TOKEN")
         property "sonar.java.coveragePlugin", "jacoco"
         property "sonar.coverage.jacoco.xmlReportPaths", "./build/reports/jacoco/test/jacocoTestReport.xml"
     }

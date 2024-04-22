@@ -11,7 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.Optional;
 
 @DataJpaTest
-public class UserRepositoryTest {
+class UserRepositoryTest {
 
     @Autowired
     private EntityManager entityManager;
@@ -35,8 +35,7 @@ public class UserRepositoryTest {
 
         Optional<UserEntity> foundUser = userRepository.findByEmail(email);
 
-        assertThat(foundUser).isPresent();
-        assertThat(foundUser.get()).isEqualTo(expectedUser);
+        assertThat(foundUser).isPresent().contains(expectedUser);
     }
 
     @Test
