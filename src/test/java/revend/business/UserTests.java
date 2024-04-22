@@ -5,6 +5,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import revend.business.exception.EmailAlreadyExistsException;
 import revend.business.exception.InvalidUserException;
 import revend.business.impl.*;
 import revend.domain.*;
@@ -56,6 +57,26 @@ class UserTests {
         verify(userRepository).save(any(UserEntity.class));
         assertNotNull(response, "Response should not be null");
         assertEquals(savedUserEntity.getId(), response.getUserId(), "The returned user ID should match the saved entity's ID");
+    }
+
+    @Test
+    void createUserTest_EmailAlreadyExists() {
+        CreateUserRequest request = CreateUserRequest.builder()
+                .email("john.doe@example.com")
+                .firstName("John")
+                .lastName("Doe")
+                .password("strongPassword123")
+                .build();
+
+        when(userRepository.existsByEmail(request.getEmail())).thenReturn(true);
+
+        Exception exception = assertThrows(EmailAlreadyExistsException.class, () ->
+            createUserUseCase.createUser(request)
+        );
+
+        assertEquals("400 BAD_REQUEST \"EMAIL_ALREADY_EXISTS\"", exception.getMessage());
+
+        verify(userRepository, never()).save(any());
     }
 
     @Test
