@@ -24,3 +24,13 @@ test:
 sonarqube-check:
   stage: sonarqube-check
   script: ./gradlew test sonar jacocoTestReport
+
+docker-deploy:
+  stage: docker-deploy
+  script:
+    - echo "Building Docker image..."
+    - docker build -t revend-backend:latest .
+    - echo "Running Docker container..."
+    - docker run --name revend-be-container -p 8080:8080 --network revend-network -d revend-backend:latest
+  only:
+    - main
