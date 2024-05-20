@@ -34,8 +34,8 @@ docker-deploy:
   stage: docker-deploy
   script:
     - echo "Stopping and removing existing Docker container..."
-    - docker stop revend-be-container || true
-    - docker rm revend-be-container || true
+    - docker stop revend-be-container -or $true
+    - docker rm revend-be-container -or $true
     - echo "Building Docker image..."
     - docker build -t revend-backend:latest .
     - echo "Running Docker container..."
