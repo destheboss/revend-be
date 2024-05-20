@@ -5,10 +5,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import revend.business.exception.EmailAlreadyExistsException;
 import revend.business.exception.InvalidUserException;
+import revend.business.exception.UnauthorizedDataAccessException;
 import revend.business.impl.*;
+import revend.configuration.security.token.AccessToken;
 import revend.domain.*;
+import revend.persistence.entity.RoleEnum;
 import revend.persistence.entity.UserEntity;
 import revend.persistence.UserRepository;
 
@@ -23,6 +27,12 @@ import static org.mockito.Mockito.*;
 class UserTests {
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private PasswordEncoder passwordEncoder;
+
+    @Mock
+    private AccessToken requestAccessToken;
 
     @InjectMocks
     private CreateUserUseCaseImpl createUserUseCase;
@@ -50,10 +60,13 @@ class UserTests {
 
         UserEntity savedUserEntity = new UserEntity();
         savedUserEntity.setId(1L);
+
+        when(passwordEncoder.encode(request.getPassword())).thenReturn("encodedPassword123");
         when(userRepository.save(any(UserEntity.class))).thenReturn(savedUserEntity);
 
         CreateUserResponse response = createUserUseCase.createUser(request);
 
+        verify(passwordEncoder).encode(request.getPassword());
         verify(userRepository).save(any(UserEntity.class));
         assertNotNull(response, "Response should not be null");
         assertEquals(savedUserEntity.getId(), response.getUserId(), "The returned user ID should match the saved entity's ID");
@@ -105,12 +118,42 @@ class UserTests {
         existingUser.setPassword("strongPassword123");
 
         when(userRepository.findByEmail(request.getEmail())).thenReturn(Optional.of(existingUser));
+        lenient().when(requestAccessToken.hasRole(RoleEnum.ADMIN.name())).thenReturn(true);
+        lenient().when(requestAccessToken.getUserId()).thenReturn(1L);
+
         doAnswer(invocation -> invocation.getArgument(0)).when(userRepository).save(any(UserEntity.class));
 
         updateUserUseCase.updateUser(request);
 
         verify(userRepository).findByEmail(request.getEmail());
         verify(userRepository).save(any(UserEntity.class));
+    }
+
+    @Test
+    void updateUserTest_Unauthorized() {
+        UpdateUserRequest request = new UpdateUserRequest();
+        request.setEmail("john.doe@example.com");
+        request.setFirstName("John");
+        request.setLastName("UpdatedLast");
+        request.setPassword("newPassword123");
+
+        UserEntity existingUser = new UserEntity();
+        existingUser.setId(1L);
+        existingUser.setEmail("john.doe@example.com");
+        existingUser.setFirstName("John");
+        existingUser.setLastName("Doe");
+        existingUser.setPassword("strongPassword123");
+
+        when(userRepository.findByEmail(request.getEmail())).thenReturn(Optional.of(existingUser));
+        when(requestAccessToken.hasRole(RoleEnum.ADMIN.name())).thenReturn(false);
+        when(requestAccessToken.getUserId()).thenReturn(2L);
+
+        assertThrows(UnauthorizedDataAccessException.class, () -> {
+            updateUserUseCase.updateUser(request);
+        });
+
+        verify(userRepository).findByEmail(request.getEmail());
+        verify(userRepository, never()).save(any(UserEntity.class));
     }
 
     @Test
@@ -131,15 +174,40 @@ class UserTests {
 
     @Test
     void getUser_WhenUserExists() {
-        String email = "test@example.com";
-        UserEntity mockUser = new UserEntity();
-        mockUser.setEmail(email);
-        when(userRepository.findByEmail(email)).thenReturn(Optional.of(mockUser));
+        UserEntity existingUser = new UserEntity();
+        existingUser.setId(1L);
+        existingUser.setEmail("john.doe@example.com");
+        existingUser.setFirstName("John");
+        existingUser.setLastName("Doe");
+        existingUser.setPassword("strongPassword123");
 
-        Optional<User> result = getUserUseCase.getUser(email);
+        when(userRepository.findByEmail(existingUser.getEmail())).thenReturn(Optional.of(existingUser));
+
+        lenient().when(requestAccessToken.hasRole(RoleEnum.ADMIN.name())).thenReturn(true);
+        lenient().when(requestAccessToken.getUserId()).thenReturn(1L);
+
+        Optional<User> result = getUserUseCase.getUser(existingUser.getEmail());
+
+        verify(userRepository, times(1)).findByEmail(existingUser.getEmail());
 
         assertTrue(result.isPresent());
-        assertEquals(email, result.get().getEmail());
+        assertEquals(existingUser.getEmail(), result.get().getEmail());
+    }
+
+    @Test
+    void getUser_WhenUnauthorized_ShouldThrowException() {
+        String email = "test@example.com";
+        UserEntity mockUser = new UserEntity();
+        mockUser.setId(2L);
+        mockUser.setEmail(email);
+
+        when(userRepository.findByEmail(email)).thenReturn(Optional.of(mockUser));
+        when(requestAccessToken.hasRole(RoleEnum.ADMIN.name())).thenReturn(false);
+        when(requestAccessToken.getUserId()).thenReturn(1L);
+
+        assertThrows(UnauthorizedDataAccessException.class, () -> {
+            getUserUseCase.getUser(email);
+        });
     }
 
     @Test
@@ -155,7 +223,7 @@ class UserTests {
     @Test
     void getUsers_ReturnsUserList() {
         List<UserEntity> userList = List.of(
-                new UserEntity(), // Add user details as necessary
+                new UserEntity(),
                 new UserEntity()
         );
         when(userRepository.findAll()).thenReturn(userList);
