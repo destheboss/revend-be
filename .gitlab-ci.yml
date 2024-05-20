@@ -8,6 +8,7 @@ variables:
 stages:
   - build
   - test
+  - prepare
   - sonarqube-check
   - docker-deploy
 #  - sonarqube-vulnerability-report
@@ -21,6 +22,11 @@ build:
       - build/libs/*.jar
     expire_in: 1 hour
 
+prepare:
+  stage: prepare
+  script:
+    - git fetch --unshallow
+
 test:
   stage: test
   script:
@@ -33,6 +39,9 @@ sonarqube-check:
 docker-deploy:
   stage: docker-deploy
   script:
+    - echo "Stopping and removing existing Docker container..."
+    - docker stop revend-be-container || true
+    - docker rm revend-be-container || true
     - echo "Building Docker image..."
     - docker build -t revend-backend:latest .
     - echo "Running Docker container..."
