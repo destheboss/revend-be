@@ -8,7 +8,6 @@ variables:
 stages:
   - build
   - test
-  - prepare
   - sonarqube-check
   - docker-deploy
 #  - sonarqube-vulnerability-report
@@ -21,11 +20,6 @@ build:
     paths:
       - build/libs/*.jar
     expire_in: 1 hour
-
-prepare:
-  stage: prepare
-  script:
-    - git fetch --unshallow
 
 test:
   stage: test
