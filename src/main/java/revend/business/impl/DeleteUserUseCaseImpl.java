@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
-
 public class DeleteUserUseCaseImpl implements DeleteUserUseCase {
     private final UserRepository userRepository;
 

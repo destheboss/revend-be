@@ -13,7 +13,6 @@ import java.util.Optional;
 
 @Service
 @AllArgsConstructor
-
 public class GetUserUseCaseImpl implements GetUserUseCase {
     private UserRepository userRepository;
     private AccessToken requestAccessToken;

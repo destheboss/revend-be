@@ -5,11 +5,16 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class LoginResponse {
-    private String accessToken;
-    private String refreshToken;
+public class Listing {
+    private Long id;
+    private String title;
+    private String description;
+    private BigDecimal price;
+    private Long userId;
 }

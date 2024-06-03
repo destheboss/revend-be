@@ -25,7 +25,7 @@ class LoginControllerTests {
 
     @Test
     void login_ValidRequest_ReturnsCreatedResponse() {
-        LoginResponse expectedResponse = new LoginResponse("dummyAccessToken");
+        LoginResponse expectedResponse = new LoginResponse("dummyAccessToken", "dummyRefreshToken");
         when(loginUseCase.login(any(LoginRequest.class))).thenReturn(expectedResponse);
 
         LoginRequest loginRequest = new LoginRequest("test@example.com", "password123");
@@ -35,7 +35,6 @@ class LoginControllerTests {
         verify(loginUseCase, times(1)).login(loginRequest);
 
         assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
-
         assertEquals(expectedResponse, responseEntity.getBody());
     }
 }

@@ -11,6 +11,8 @@ import revend.business.exception.InvalidCredentialsException;
 import revend.business.impl.LoginUseCaseImpl;
 import revend.configuration.security.token.AccessToken;
 import revend.configuration.security.token.AccessTokenEncoder;
+import revend.configuration.security.token.RefreshToken;
+import revend.configuration.security.token.RefreshTokenEncoder;
 import revend.domain.LoginRequest;
 import revend.domain.LoginResponse;
 import revend.persistence.UserRepository;
@@ -35,6 +37,9 @@ class LoginTests {
     @Mock
     private AccessTokenEncoder accessTokenEncoder;
 
+    @Mock
+    private RefreshTokenEncoder refreshTokenEncoder;
+
     @InjectMocks
     private LoginUseCaseImpl loginUseCase;
 
@@ -43,6 +48,7 @@ class LoginTests {
         String email = "test@example.com";
         String password = "password123";
         String accessToken = "dummyAccessToken";
+        String refreshToken = "dummyRefreshToken";
 
         UserRoleEntity role = new UserRoleEntity();
         role.setRole(RoleEnum.USER);
@@ -55,6 +61,7 @@ class LoginTests {
         when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
         when(passwordEncoder.matches(password, user.getPassword())).thenReturn(true);
         when(accessTokenEncoder.encode(any(AccessToken.class))).thenReturn(accessToken);
+        when(refreshTokenEncoder.encode(any(RefreshToken.class))).thenReturn(refreshToken);
 
         LoginRequest request = new LoginRequest();
         request.setUsername(email);
@@ -63,6 +70,7 @@ class LoginTests {
 
         assertNotNull(response);
         assertEquals(accessToken, response.getAccessToken());
+        assertEquals(refreshToken, response.getRefreshToken());
     }
 
     @SuppressWarnings("java:S2699")
@@ -107,6 +115,7 @@ class LoginTests {
         String email = "test@example.com";
         String password = "password123";
         String accessToken = "dummyAccessToken";
+        String refreshToken = "dummyRefreshToken";
 
         UserRoleEntity role = new UserRoleEntity();
         role.setRole(RoleEnum.USER);
@@ -119,6 +128,7 @@ class LoginTests {
         when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
         when(passwordEncoder.matches(password, user.getPassword())).thenReturn(true);
         when(accessTokenEncoder.encode(any(AccessToken.class))).thenReturn(accessToken);
+        when(refreshTokenEncoder.encode(any(RefreshToken.class))).thenReturn(refreshToken);
 
         LoginRequest request = new LoginRequest();
         request.setUsername(email);
@@ -127,5 +137,6 @@ class LoginTests {
 
         assertNotNull(response);
         assertEquals(accessToken, response.getAccessToken());
+        assertEquals(refreshToken, response.getRefreshToken());
     }
 }

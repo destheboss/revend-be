@@ -5,4 +5,5 @@ import revend.domain.LoginResponse;
 
 public interface LoginUseCase {
     LoginResponse login(LoginRequest loginRequest);
+    String refresh(String refreshToken);
 }

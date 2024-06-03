@@ -28,6 +28,4 @@ public class GetUsersUseCaseImpl implements GetUsersUseCase {
 
         return response;
     }
-
-
 }
