@@ -18,8 +18,8 @@ public class GetUserUseCaseImpl implements GetUserUseCase {
     private AccessToken requestAccessToken;
 
     @Override
-    public Optional<User> getUser(String email) {
-        Optional<User> userOptional = userRepository.findByEmail(email).map(UserConverter::convert);
+    public Optional<User> getUser(Long id) {
+        Optional<User> userOptional = userRepository.findById(id).map(UserConverter::convert);
 
         if (userOptional.isPresent()) {
             if (!requestAccessToken.hasRole(RoleEnum.ADMIN.name()) &&

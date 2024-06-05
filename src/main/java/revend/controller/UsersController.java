@@ -22,9 +22,9 @@ public class UsersController {
     private final UpdateUserUseCase updateUserUseCase;
 
     @RolesAllowed({"USER", "ADMIN"})
-    @GetMapping("{email}")
-    public ResponseEntity<User> getUser(@PathVariable(value = "email") final String email) {
-        return getUserUseCase.getUser(email)
+    @GetMapping("{userId}")
+    public ResponseEntity<User> getUser(@PathVariable(value = "userId") final Long userId) {
+        return getUserUseCase.getUser(userId)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
@@ -38,9 +38,9 @@ public class UsersController {
     }
 
     @RolesAllowed({"ADMIN"})
-    @DeleteMapping("{userEmail}")
-    public ResponseEntity<Void> deleteUser(@PathVariable String userEmail) {
-        deleteUserUseCase.deleteUser(userEmail);
+    @DeleteMapping("{userId}")
+    public ResponseEntity<Void> deleteUser(@PathVariable Long userId) {
+        deleteUserUseCase.deleteUser(userId);
         return ResponseEntity.noContent().build();
     }
 
@@ -51,10 +51,10 @@ public class UsersController {
     }
 
     @RolesAllowed({"USER", "ADMIN"})
-    @PutMapping("{email}")
-    public ResponseEntity<Void> updateUser(@PathVariable("email") String email,
+    @PutMapping("{userId}")
+    public ResponseEntity<Void> updateUser(@PathVariable("userId") long userId,
                                            @RequestBody @Valid UpdateUserRequest request) {
-        request.setEmail(email);
+        request.setId(userId);
         updateUserUseCase.updateUser(request);
         return ResponseEntity.noContent().build();
     }

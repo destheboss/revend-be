@@ -5,5 +5,5 @@ import revend.domain.User;
 import java.util.Optional;
 
 public interface GetUserUseCase {
-    Optional<User> getUser(String email);
+    Optional<User> getUser(Long id);
 }

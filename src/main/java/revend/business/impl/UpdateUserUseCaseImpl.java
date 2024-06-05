@@ -21,7 +21,7 @@ public class UpdateUserUseCaseImpl implements UpdateUserUseCase {
 
     @Override
     public void updateUser(UpdateUserRequest request) {
-        Optional<UserEntity> userOptional = userRepository.findByEmail(request.getEmail());
+        Optional<UserEntity> userOptional = userRepository.findById(request.getId());
 
         if (userOptional.isEmpty()) {
             throw new InvalidUserException("USER_EMAIL_INVALID");

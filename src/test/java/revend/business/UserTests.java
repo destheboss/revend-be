@@ -94,12 +94,12 @@ class UserTests {
 
     @Test
     void deleteUserTest() {
-        String email = "john.doe@example.com";
-        doNothing().when(userRepository).deleteByEmail(email);
+        Long id = 1L;
+        doNothing().when(userRepository).deleteById(id);
 
-        deleteUserUseCase.deleteUser(email);
+        deleteUserUseCase.deleteUser(id);
 
-        verify(userRepository).deleteByEmail(email);
+        verify(userRepository).deleteById(id);
     }
 
     @Test
@@ -117,15 +117,15 @@ class UserTests {
         existingUser.setLastName("Doe");
         existingUser.setPassword("strongPassword123");
 
-        when(userRepository.findByEmail(request.getEmail())).thenReturn(Optional.of(existingUser));
+        when(userRepository.findById(request.getId())).thenReturn(Optional.of(existingUser));
         lenient().when(requestAccessToken.hasRole(RoleEnum.ADMIN.name())).thenReturn(true);
-        lenient().when(requestAccessToken.getUserId()).thenReturn(1L);
+        lenient().when(requestAccessToken.getUserId()).thenReturn(13L);
 
         doAnswer(invocation -> invocation.getArgument(0)).when(userRepository).save(any(UserEntity.class));
 
         updateUserUseCase.updateUser(request);
 
-        verify(userRepository).findByEmail(request.getEmail());
+        verify(userRepository).findById(request.getId());
         verify(userRepository).save(any(UserEntity.class));
     }
 
@@ -144,7 +144,7 @@ class UserTests {
         existingUser.setLastName("Doe");
         existingUser.setPassword("strongPassword123");
 
-        when(userRepository.findByEmail(request.getEmail())).thenReturn(Optional.of(existingUser));
+        when(userRepository.findById(request.getId())).thenReturn(Optional.of(existingUser));
         when(requestAccessToken.hasRole(RoleEnum.ADMIN.name())).thenReturn(false);
         when(requestAccessToken.getUserId()).thenReturn(2L);
 
@@ -152,23 +152,23 @@ class UserTests {
             updateUserUseCase.updateUser(request);
         });
 
-        verify(userRepository).findByEmail(request.getEmail());
+        verify(userRepository).findById(request.getId());
         verify(userRepository, never()).save(any(UserEntity.class));
     }
 
     @Test
     void updateUserTest_Failure_UserNotFound() {
         UpdateUserRequest request = new UpdateUserRequest();
-        request.setEmail("nonexistent@example.com");
+        request.setId(1L);
 
-        when(userRepository.findByEmail(request.getEmail())).thenReturn(Optional.empty());
+        when(userRepository.findById(request.getId())).thenReturn(Optional.empty());
 
         Exception exception = assertThrows(InvalidUserException.class, () ->
                 updateUserUseCase.updateUser(request)
         );
 
         assertEquals("400 BAD_REQUEST \"USER_EMAIL_INVALID\"", exception.getMessage());
-        verify(userRepository).findByEmail(request.getEmail());
+        verify(userRepository).findById(request.getId());
         verify(userRepository, never()).save(any(UserEntity.class));
     }
 
@@ -181,14 +181,14 @@ class UserTests {
         existingUser.setLastName("Doe");
         existingUser.setPassword("strongPassword123");
 
-        when(userRepository.findByEmail(existingUser.getEmail())).thenReturn(Optional.of(existingUser));
+        when(userRepository.findById(existingUser.getId())).thenReturn(Optional.of(existingUser));
 
         lenient().when(requestAccessToken.hasRole(RoleEnum.ADMIN.name())).thenReturn(true);
-        lenient().when(requestAccessToken.getUserId()).thenReturn(1L);
+        lenient().when(requestAccessToken.getUserId()).thenReturn(13L);
 
-        Optional<User> result = getUserUseCase.getUser(existingUser.getEmail());
+        Optional<User> result = getUserUseCase.getUser(existingUser.getId());
 
-        verify(userRepository, times(1)).findByEmail(existingUser.getEmail());
+        verify(userRepository, times(1)).findById(existingUser.getId());
 
         assertTrue(result.isPresent());
         assertEquals(existingUser.getEmail(), result.get().getEmail());
@@ -196,26 +196,25 @@ class UserTests {
 
     @Test
     void getUser_WhenUnauthorized_ShouldThrowException() {
-        String email = "test@example.com";
+        Long id = 1L;
         UserEntity mockUser = new UserEntity();
-        mockUser.setId(2L);
-        mockUser.setEmail(email);
+        mockUser.setId(id);
 
-        when(userRepository.findByEmail(email)).thenReturn(Optional.of(mockUser));
+        when(userRepository.findById(id)).thenReturn(Optional.of(mockUser));
         when(requestAccessToken.hasRole(RoleEnum.ADMIN.name())).thenReturn(false);
-        when(requestAccessToken.getUserId()).thenReturn(1L);
+        when(requestAccessToken.getUserId()).thenReturn(2L);
 
         assertThrows(UnauthorizedDataAccessException.class, () -> {
-            getUserUseCase.getUser(email);
+            getUserUseCase.getUser(id);
         });
     }
 
     @Test
     void getUser_WhenUserDoesNotExist() {
-        String email = "missing@example.com";
-        when(userRepository.findByEmail(email)).thenReturn(Optional.empty());
+        Long id = 1L;
+        when(userRepository.findById(id)).thenReturn(Optional.empty());
 
-        Optional<User> result = getUserUseCase.getUser(email);
+        Optional<User> result = getUserUseCase.getUser(id);
 
         assertFalse(result.isPresent());
     }

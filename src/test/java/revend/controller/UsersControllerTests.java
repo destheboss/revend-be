@@ -44,11 +44,11 @@ class UsersControllerTests {
 
     @Test
     void testGetUser_ExistingUser_ReturnsUser() {
-        String email = "test@example.com";
+        Long id = 1L;
         User user = new User();
-        when(getUserUseCase.getUser(email)).thenReturn(Optional.of(user));
+        when(getUserUseCase.getUser(id)).thenReturn(Optional.of(user));
 
-        ResponseEntity<User> response = usersController.getUser(email);
+        ResponseEntity<User> response = usersController.getUser(id);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(user, response.getBody());
@@ -56,10 +56,10 @@ class UsersControllerTests {
 
     @Test
     void testGetUser_NonExistingUser_ReturnsNotFound() {
-        String email = "test@example.com";
-        when(getUserUseCase.getUser(email)).thenReturn(Optional.empty());
+        Long id = 1L;
+        when(getUserUseCase.getUser(id)).thenReturn(Optional.empty());
 
-        ResponseEntity<User> response = usersController.getUser(email);
+        ResponseEntity<User> response = usersController.getUser(id);
 
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
         assertNull(response.getBody());
@@ -83,12 +83,12 @@ class UsersControllerTests {
 
     @Test
     void testDeleteUser_UserDeleted_ReturnsNoContent() {
-        String userEmail = "test@example.com";
+        Long id = 1L;
 
-        ResponseEntity<Void> response = usersController.deleteUser(userEmail);
+        ResponseEntity<Void> response = usersController.deleteUser(id);
 
         assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
-        verify(deleteUserUseCase, times(1)).deleteUser(userEmail);
+        verify(deleteUserUseCase, times(1)).deleteUser(id);
     }
 
     @Test
@@ -105,11 +105,12 @@ class UsersControllerTests {
 
     @Test
     void testUpdateUser_ValidRequest_ReturnsNoContent() {
-        String email = "test@example.com";
+        long id = 1L;
+
         UpdateUserRequest request = new UpdateUserRequest();
         doNothing().when(updateUserUseCase).updateUser(request);
 
-        ResponseEntity<Void> response = usersController.updateUser(email, request);
+        ResponseEntity<Void> response = usersController.updateUser(id, request);
 
         assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
     }
