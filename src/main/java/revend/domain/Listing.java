@@ -16,5 +16,7 @@ public class Listing {
     private String title;
     private String description;
     private BigDecimal price;
+    private String category;
     private Long userId;
+    private String imageData;
 }

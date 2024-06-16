@@ -33,6 +33,7 @@ class ListingRepositoryTests {
                 .lastName("Doe")
                 .email("john.doe@example.com")
                 .password("password")
+                .imageData(null)
                 .build();
         userEntity = entityManager.merge(userEntity);
 
@@ -40,6 +41,7 @@ class ListingRepositoryTests {
                 .title("Test Listing")
                 .description("A test listing description")
                 .price(BigDecimal.valueOf(100.00))
+                .category("CARS")
                 .user(userEntity)
                 .build();
         listingEntity = entityManager.merge(listingEntity);

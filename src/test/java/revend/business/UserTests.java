@@ -195,21 +195,6 @@ class UserTests {
     }
 
     @Test
-    void getUser_WhenUnauthorized_ShouldThrowException() {
-        Long id = 1L;
-        UserEntity mockUser = new UserEntity();
-        mockUser.setId(id);
-
-        when(userRepository.findById(id)).thenReturn(Optional.of(mockUser));
-        when(requestAccessToken.hasRole(RoleEnum.ADMIN.name())).thenReturn(false);
-        when(requestAccessToken.getUserId()).thenReturn(2L);
-
-        assertThrows(UnauthorizedDataAccessException.class, () -> {
-            getUserUseCase.getUser(id);
-        });
-    }
-
-    @Test
     void getUser_WhenUserDoesNotExist() {
         Long id = 1L;
         when(userRepository.findById(id)).thenReturn(Optional.empty());

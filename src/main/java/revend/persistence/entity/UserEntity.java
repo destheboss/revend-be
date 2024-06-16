@@ -2,10 +2,7 @@ package revend.persistence.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.Set;
 
@@ -33,6 +30,11 @@ public class UserEntity {
     @Column(name = "email")
     private String email;
 
+    @Lob
+    @Basic(fetch = FetchType.LAZY)
+    @Column(name = "image_data", columnDefinition = "BLOB")
+    private byte[] imageData;
+
     @NotNull
     @Column(name = "password")
     private String password;
@@ -43,4 +45,13 @@ public class UserEntity {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<ListingEntity> listings;
+
+    @OneToMany(mappedBy = "user1", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<ConversationEntity> conversationsAsUser1;
+
+    @OneToMany(mappedBy = "user2", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<ConversationEntity> conversationsAsUser2;
+
+    @OneToMany(mappedBy = "fromUser", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<MessageEntity> messages;
 }

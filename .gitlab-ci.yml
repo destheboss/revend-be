@@ -4,6 +4,7 @@
 # isolated from any previous builds.
 variables:
   GRADLE_OPTS: "-Dorg.gradle.daemon=false"
+  SONAR_TOKEN: $SONAR_TOKEN
 
 stages:
   - build

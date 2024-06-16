@@ -29,6 +29,15 @@ public class ListingEntity {
     @Column(name = "price")
     private BigDecimal price;
 
+    @NotNull
+    @Column(name = "category")
+    private String category;
+
+    @Lob
+    @Basic(fetch = FetchType.LAZY)
+    @Column(name = "image_data", columnDefinition = "BLOB")
+    private byte[] imageData;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     @ToString.Exclude

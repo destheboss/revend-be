@@ -16,4 +16,6 @@ public class UpdateListingRequest {
     private String title;
     private String description;
     private BigDecimal price;
+    private String category;
+    private String imageBase64;
 }

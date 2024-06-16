@@ -24,6 +24,7 @@ public class ListingController {
     private final UpdateListingUseCase updateListingUseCase;
     private final DeleteListingUseCase deleteListingUseCase;
     private final GetListingsUseCase getListingsUseCase;
+    private final GetAllListingsUseCase getAllListingsUseCase;
 
     @PostMapping
     public ResponseEntity<CreateListingResponse> createListing(@RequestBody CreateListingRequest request) {
@@ -55,6 +56,12 @@ public class ListingController {
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<Listing>> getUserListings(@PathVariable Long userId) {
         List<Listing> listings = getListingsUseCase.getListings(userId);
+        return ResponseEntity.ok(listings);
+    }
+
+    @GetMapping()
+    public ResponseEntity<List<Listing>> getAllListings() {
+        List<Listing> listings = getAllListingsUseCase.getAllListings();
         return ResponseEntity.ok(listings);
     }
 }

@@ -9,11 +9,9 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class User {
+public class Conversation {
     private Long id;
-    private String firstName;
-    private String lastName;
-    private String email;
-    private String password;
-    private String imageData;
+    private String title;
+    private Long user1Id;
+    private Long user2Id;
 }

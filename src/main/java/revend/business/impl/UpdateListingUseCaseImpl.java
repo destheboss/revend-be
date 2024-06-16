@@ -3,6 +3,7 @@ package revend.business.impl;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import revend.business.UpdateListingUseCase;
+import revend.business.exception.ImageProcessingException;
 import revend.business.exception.ListingNotFoundException;
 import revend.business.exception.UnauthorizedDataAccessException;
 import revend.configuration.security.token.AccessToken;
@@ -27,10 +28,25 @@ public class UpdateListingUseCaseImpl implements UpdateListingUseCase {
             throw new UnauthorizedDataAccessException("USER_ID_NOT_FROM_LOGGED_IN_USER");
         }
 
-        listingEntity.setTitle(request.getTitle());
-        listingEntity.setDescription(request.getDescription());
-        listingEntity.setPrice(request.getPrice());
+        byte[] imageData = null;
+        if (request.getImageBase64() != null && !request.getImageBase64().isEmpty()) {
+            try {
+                imageData = ImageDataConversion.decodeBase64ToBytes(request.getImageBase64());
+            } catch (ImageProcessingException e) {
+                throw new ImageProcessingException("Failed to decode image data");
+            }
+        }
 
-        listingRepository.save(listingEntity);
+        updateFields(request, listingEntity, imageData);
+    }
+
+    private void updateFields(UpdateListingRequest request, ListingEntity listing, byte[] imageData) {
+        listing.setTitle(request.getTitle());
+        listing.setDescription(request.getDescription());
+        listing.setPrice(request.getPrice());
+        listing.setImageData(imageData);
+        listing.setCategory(request.getCategory());
+
+        listingRepository.save(listing);
     }
 }

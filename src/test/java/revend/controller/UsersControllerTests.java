@@ -68,8 +68,8 @@ class UsersControllerTests {
     @Test
     void testGetAllUsers_ValidRequest_ReturnsOk() {
         List<User> users = new ArrayList<>();
-        users.add(new User(1L, "John", "Doe", "john@example.com", "password"));
-        users.add(new User(2L, "Jane", "Doe", "jane@example.com", "password"));
+        users.add(new User(1L, "John", "Doe", "john@example.com", "password", ""));
+        users.add(new User(2L, "Jane", "Doe", "jane@example.com", "password", ""));
         GetAllUsersRequest request = GetAllUsersRequest.builder().build();
         GetAllUsersResponse expectedResponse = new GetAllUsersResponse(users);
 

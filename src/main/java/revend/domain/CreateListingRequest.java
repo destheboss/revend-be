@@ -25,4 +25,9 @@ public class CreateListingRequest {
 
     @NotNull(message = "User ID is required")
     private Long userId;
+
+    @NotNull(message = "Category is required")
+    private String category;
+
+    private String imageBase64;
 }

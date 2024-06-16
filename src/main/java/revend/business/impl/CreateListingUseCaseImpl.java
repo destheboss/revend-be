@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import revend.business.CreateListingUseCase;
+import revend.business.exception.ImageProcessingException;
 import revend.business.exception.InvalidUserException;
 import revend.domain.CreateListingRequest;
 import revend.domain.CreateListingResponse;
@@ -24,19 +25,32 @@ public class CreateListingUseCaseImpl implements CreateListingUseCase {
         UserEntity userEntity = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new InvalidUserException("User not found"));
 
+        byte[] imageData = null;
+        if (request.getImageBase64() != null && !request.getImageBase64().isEmpty()) {
+            try {
+                imageData = ImageDataConversion.decodeBase64ToBytes(request.getImageBase64());
+            } catch (ImageProcessingException e) {
+                throw new ImageProcessingException("Failed to decode image data");
+            }
+        }
 
-
-        ListingEntity newListing = ListingEntity.builder()
-                .title(request.getTitle())
-                .description(request.getDescription())
-                .price(request.getPrice())
-                .user(userEntity)
-                .build();
-
-        ListingEntity savedListing = listingRepository.save(newListing);
+        ListingEntity savedListing = saveNewListing(request, userEntity, imageData);
 
         return CreateListingResponse.builder()
                 .listingId(savedListing.getId())
                 .build();
+    }
+
+    private ListingEntity saveNewListing(CreateListingRequest request, UserEntity user, byte[] imageData) {
+        ListingEntity newListing = ListingEntity.builder()
+                .title(request.getTitle())
+                .description(request.getDescription())
+                .price(request.getPrice())
+                .category(request.getCategory())
+                .imageData(imageData)
+                .user(user)
+                .build();
+
+        return listingRepository.save(newListing);
     }
 }
